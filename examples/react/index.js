@@ -1,6 +1,6 @@
 'use strict';
 
-import {defineReact} from  '../../src/definedReact';
+import {defineReact} from  '../../src/defineReact';
 
 const data = {}
 
