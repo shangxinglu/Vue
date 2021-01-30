@@ -7,7 +7,7 @@
 /**
  * @description 定义响应式数据
  */
-function defineReact(data,key,val){
+function defineReactive(data,key,val){
     const dep = [];
     Object.defineProperty(data,key,{
         configurable:true,
@@ -35,4 +35,4 @@ function defineReact(data,key,val){
     })
 }
 
-export {defineReact,};
+export {defineReactive,};

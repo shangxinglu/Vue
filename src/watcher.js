@@ -1,5 +1,7 @@
 'use strict';
 
+
+
 /**
  * @description 观察者
  * 
@@ -13,8 +15,10 @@
     window.vueDep = listener;
 
     // 依赖注入
+    if(typeof express === 'function'){
+
+    }
     obj[express];
-    console.log(obj[express]);
 
 
     
