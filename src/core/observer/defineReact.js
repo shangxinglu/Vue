@@ -1,14 +1,12 @@
 'use strict';
 
-/**
- * 依赖存放到window.vueDep
- */
+import Dep from './dep';
 
 /**
  * @description 定义响应式数据
  */
 function defineReactive(data,key,val){
-    const dep = [];
+    const dep = new Dep;
     Object.defineProperty(data,key,{
         configurable:true,
         enumerable:true,
@@ -27,7 +25,7 @@ function defineReactive(data,key,val){
 
         get(){
             if(window.vueDep&&dep.indexOf(window.vueDep)<0){
-                dep.push(window.vueDep);
+                dep.append();
             }
             
             return val;

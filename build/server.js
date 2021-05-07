@@ -13,9 +13,9 @@ app.use(webpackDevMiddleware(compiler,{
     publicPath:config.output.publicPath,
 }));
 
-app.use(webpackHotMiddleware(compiler,{
-    // log:false
-}));
+// app.use(webpackHotMiddleware(compiler,{
+//     // log:false
+// }));
 
 app.listen(8080,()=>{
     console.log('webpack middleware start listen 8080...');

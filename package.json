@@ -23,7 +23,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config ./build/webpack.config.js",
-    "server": "node ./build/server.js"
+    "server": "node ./build/server.js",
+    "dev": "node ./build/devServer.js"
   },
   "repository": {
     "type": "git",

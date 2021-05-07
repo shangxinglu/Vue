@@ -9,7 +9,8 @@ const distPath = '../dist';
 
 module.exports = {
     mode: "development",
-    entry: ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true','/build/index.js'],
+    // entry: ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true', '/build/index.js'],
+    entry: '/build/index.js',
     output: {
         filename: 'index.js',
         path: path.resolve(__dirname, distPath),
@@ -24,5 +25,5 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
 
     ],
-    watch:true,
+   
 }
