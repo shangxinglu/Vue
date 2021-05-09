@@ -2,7 +2,7 @@
 
 import {remove} from '../util/index';
 
-class Dep {
+export default class Dep {
 
     constructor(){
         this.subs=[];
@@ -34,5 +34,6 @@ class Dep {
 Dep.target = null;
 
 
-
-export default Dep;
+export function setTarget(target){
+    Dep.target = target;
+}

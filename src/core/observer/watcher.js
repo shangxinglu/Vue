@@ -1,27 +1,45 @@
 'use strict';
 
+import {
+   parsePath
+} from '../util/index';
 
+import {setTarget} from './dep';
 
-/**
- * @description 观察者
- * 
- * @param {Object}  obj 观察对象
- * @param {String|Function} express  观察的属性表达式
- * @param {Function} listener 监听器
- */
- const Wathcer = (obj,express,listener)=>{
-    
-    // 设置依赖
-    window.vueDep = listener;
+export default class Wathcer {
 
-    // 依赖注入
-    if(typeof express === 'function'){
+   /**
+    * @param {Object} 响应数据对象
+    * @param {String|Function} expOrFn 需要收集依赖的属性路径或者获取该属性的方法
+    * @param {Function} cb 回调函数
+    */
+   constructor(vm,expOrFn, cb) {
+      this.vm = vm,
+      this.cb = cb;
 
-    }
-    obj[express];
+      let getter = null;
 
+      if(typeof expOrFn === 'function'){
+         getter = expOrFn;
+      } else {
+         getter = parsePath(expOrFn);
+         if(!getter){
+            throw new Error('expOrFn');
+         }
+      }
+      this.getter = getter;
 
-    
- }
+      this.get();
+   }
 
- export {Wathcer,};
+   // 触发依赖的收集
+   get() {
+      setTarget(this.cb);
+
+     this.getter(this.vm);
+
+      setTarget(null);
+
+   }
+}
+
