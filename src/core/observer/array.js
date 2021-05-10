@@ -13,3 +13,15 @@ const methodArr = [
     'sort',
     'reverse',
 ];
+
+
+const originPro = Array.prototype;
+
+for (let item of methodArr) {
+    const originMethod = originPro[item];
+    originPro[item] = function (...args) {
+        console.log('dep run');
+        // debugger
+        originMethod.apply(this,args);
+    }
+}

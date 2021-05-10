@@ -19,7 +19,9 @@
 
 // import '../examples/obsever/watcher';
 
-import '../examples/obsever/observer';
+// import '../examples/obsever/observer';
+
+import '../examples/obsever/observerArr';
 
 
 
