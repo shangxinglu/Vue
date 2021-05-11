@@ -1,8 +1,14 @@
 'use strict';
 
+import {def} from '../util/lang';
+
 /**
- * @description 利用数组原型方法监听数组的变化
+ * 用来覆盖可响应数组实例上的[[prototype]]
+ * 实现对数组变化的监听
  */
+const originPro = Array.prototype;
+
+export const arrayMethod = Object.create(originPro);
 
 const methodArr = [
     'shift',
@@ -15,13 +21,12 @@ const methodArr = [
 ];
 
 
-const originPro = Array.prototype;
 
 for (let item of methodArr) {
     const originMethod = originPro[item];
-    originPro[item] = function (...args) {
-        console.log('dep run');
-        // debugger
-        originMethod.apply(this,args);
-    }
+    
+    def(arrayMethod,item,function mutator(...args) {
+        console.log('arrayMethod mutator');
+      return  originMethod.apply(this,args);
+    })
 }

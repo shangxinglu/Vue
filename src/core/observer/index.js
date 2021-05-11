@@ -1,6 +1,7 @@
 'use strict';
 
 import Dep from './dep';
+import {arrayMethod} from './array';
 
 /**
  * @description 定义响应式数据
@@ -11,13 +12,15 @@ export function defineReactive(data, key, val) {
         configurable: true,
         enumerable: true,
         set(newVal) {
-            dep.notice();
 
             if (val === newVal) {
                 return;
             }
 
             val = newVal;
+
+            dep.notice();
+
             return;
         },
 
@@ -45,11 +48,6 @@ export class Observer {
         }
     }
 
-    // // 检测类型
-    // detect(obj){
-
-    // }
-
     // 转换每个属性
     walk(obj) {
         const keyArr = Object.keys(obj);
@@ -57,6 +55,7 @@ export class Observer {
             const val =  obj[item];
             if(typeof val === 'object'){
                 if(Array.isArray(val)){
+                    Object.setPrototypeOf(val,arrayMethod);
                     this.observerArray(val);
                 } else {
                     this.walk(val);
