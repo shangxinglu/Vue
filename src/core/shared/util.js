@@ -5,7 +5,7 @@ export function def(obj,key,val){
     Object.defineProperty(obj,key,{
         value:val,
         writable:true,
-        enumerable:fals,
+        enumerable:true,
         configurable:true,
     });
 }
