@@ -2,6 +2,7 @@
 
 import Dep from './dep';
 import {arrayMethod} from './array';
+import {isObject} from '../util/index';
 
 /**
  * @description 定义响应式数据
@@ -56,7 +57,7 @@ export class Observer {
             if(typeof val === 'object'){
                 if(Array.isArray(val)){
                     Object.setPrototypeOf(val,arrayMethod);
-                    this.observerArray(val);
+                    // this.observerArray(val);
                 } else {
                     this.walk(val);
                 }
@@ -68,8 +69,18 @@ export class Observer {
         }
     }
 
-    // 将数组转成响应式的
-    observerArray(arr){
+    // // 将数组转成响应式的
+    // observerArray(arr){
+       
 
-    }
+    // }
+}
+
+
+/**
+ * 为val添加观察者
+ * 如果已经存在返回观察者
+ */
+export function observer(val){
+    if(!isObject(val)) return;
 }
