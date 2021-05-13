@@ -1,8 +1,9 @@
 'use strict';
 
 import Dep from './dep';
-import {arrayMethod} from './array';
-import {isObject} from '../util/index';
+import { arrayMethod } from './array';
+import { isObject, hasOwn } from '../util/index';
+import { OB_KEY } from '../shared/constant';
 
 /**
  * @description 定义响应式数据
@@ -18,6 +19,7 @@ export function defineReactive(data, key, val) {
                 return;
             }
 
+
             val = newVal;
 
             dep.notice();
@@ -26,7 +28,15 @@ export function defineReactive(data, key, val) {
         },
 
         get() {
-            dep.append();
+            if(Array.isArray(val)){
+                // debugger
+                val[OB_KEY].append();
+
+            } else {
+                dep.append();
+            }
+
+
 
             return val;
         }
@@ -40,47 +50,61 @@ export function defineReactive(data, key, val) {
 export class Observer {
 
     constructor(obj) {
-        if (typeof obj === 'object') {
-            if(Array.isArray(obj)){
-                this.observerArray(val);
-            } else {
-                this.walk(obj);
-            }
+        if (typeof obj !== 'object') return;
+
+        /**
+         * 将依赖存放到对象上
+         */
+        this.dep = new Dep;
+        if (Array.isArray(obj)) {
+            // obj[OB_KEY] = dep;
+        } else {
+            this.walk(obj);
         }
     }
 
     // 转换每个属性
     walk(obj) {
         const keyArr = Object.keys(obj);
+
         for (let item of keyArr) {
-            const val =  obj[item];
-            if(typeof val === 'object'){
-                if(Array.isArray(val)){
-                    Object.setPrototypeOf(val,arrayMethod);
+            const val = obj[item];
+            debugger
+            if (typeof val === 'object') {
+                if (Array.isArray(val)) {
+                    Object.setPrototypeOf(val, arrayMethod);
+                    val[OB_KEY] = this.dep;
+                   
+                    defineReactive(obj, item, val);
+
                     // this.observerArray(val);
                 } else {
                     this.walk(val);
                 }
 
-                return;
+                continue;
             }
 
-            defineReactive(obj, item,val);
+            defineReactive(obj, item, val);
         }
     }
 
     // // 将数组转成响应式的
     // observerArray(arr){
-       
+
 
     // }
 }
 
 
 /**
- * 为val添加观察者
- * 如果已经存在返回观察者
+ * 为val添加观察者并返回观察者
+ * 如果已经存则直接返回观察者
  */
-export function observer(val){
-    if(!isObject(val)) return;
+export function observer(val) {
+    if (!isObject(val)) return;
+    let ob = null;
+    // if () {
+    //     // ob = val.
+    // }
 }

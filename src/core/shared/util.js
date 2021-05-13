@@ -25,3 +25,10 @@ export function remove(arr, sub) {
 export function isObject(obj) {
     return obj !== null && typeof obj === 'object';
 }
+
+// 判断对象自身是否拥有指定属性
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+export function hasOwn(obj,key){
+    return hasOwnProperty.call(obj,key);
+}

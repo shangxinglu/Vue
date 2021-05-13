@@ -1,7 +1,21 @@
 'use strict';
 
-import '../../src/core/observer/array'
+import {Observer} from '../../src/core/observer/index';
+import Watcher from '../../src/core/observer/watcher';
+const obj = {
+    arr:[],
+    x:1
+};
 
-const arr = [];
+new Observer(obj);
 
-arr.push(1);
+// new Watcher(obj,'arr',function(){
+//     console.log('array dep run');
+// });
+
+new Watcher(obj,'x',function(){
+    console.log('x dep run');
+});
+
+debugger
+

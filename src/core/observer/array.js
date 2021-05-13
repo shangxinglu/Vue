@@ -1,6 +1,7 @@
 'use strict';
 
-import {def} from '../util/lang';
+import {def} from '../util/index';
+import {OB_KEY} from '../shared/constant';
 
 /**
  * 用来覆盖可响应数组实例上的[[prototype]]
@@ -27,6 +28,7 @@ for (let item of methodArr) {
     
     def(arrayMethod,item,function mutator(...args) {
         console.log('arrayMethod mutator');
+        this[OB_KEY].notice();
       return  originMethod.apply(this,args);
     })
 }
