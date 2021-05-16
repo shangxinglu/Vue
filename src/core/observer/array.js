@@ -28,7 +28,7 @@ for (let item of methodArr) {
     
     def(arrayMethod,item,function mutator(...args) {
         console.log('arrayMethod mutator');
-        this[OB_KEY].notice();
+        this[OB_KEY].dep.notice();
       return  originMethod.apply(this,args);
     })
 }

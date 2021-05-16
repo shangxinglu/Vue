@@ -1,11 +1,11 @@
 'use strict';
 
 // 为对象创建数据描述符
-export function def(obj, key, val) {
+export function def(obj, key, val,enumerable) {
     Object.defineProperty(obj, key, {
         value: val,
         writable: true,
-        enumerable: true,
+        enumerable: !!enumerable, // 控制出现无限循环的对象属性的情况
         configurable: true,
     });
 }
