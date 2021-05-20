@@ -9,23 +9,32 @@ export default class Dep {
     }
 
 
+    // 添加依赖
     addSub(sub){
         this.subs.push(sub);
     }
 
+    // 移除依赖
     removeSub(sub){
         remove(this.subs,sub);
     }
 
+    // 获取依赖
     append(){
         if(Dep.target){
-            this.addSub(Dep.target);
+            // this.addSub(Dep.target);
+
+            // 为了让watcher能够控制依赖
+            // 需要将dep传递到watcher
+            Dep.target.addDep(this);
+
         }
     }
 
-    notice(){
+    // 通知依赖
+    notify(){
         for(let item of this.subs){
-            item();
+            item.update();
         }
     }
 

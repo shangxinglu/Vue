@@ -31,7 +31,7 @@ export function defineReactive(data, key, val) {
 
             val = newVal;
 
-            dep.notice();
+            dep.notify();
 
             return;
         },
