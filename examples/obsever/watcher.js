@@ -15,5 +15,5 @@ new Watcher(parent,'son.k1',function(){
     console.log('watcher cb');
 });
 
-
-debugger;
+window.target = parent;
+// debugger;

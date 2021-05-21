@@ -49,7 +49,9 @@ export default class Wathcer {
 
    // 添加依赖
    addDep(dep) {
-      if(this.deps.includes(dep)) return;
+      // 防止dep的sub数组里重复添加
+      // 会造成update不断的迭代
+      // if(this.deps.includes(dep)) return;
       this.deps.push(dep);
       // 将watch放入dep的依赖数组内
       // 不然dep的notify无法通知依赖的执行

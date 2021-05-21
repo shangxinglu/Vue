@@ -33,7 +33,9 @@ export default class Dep {
 
     // 通知依赖
     notify(){
-        for(let item of this.subs){
+        // 防止执行新添加或修改的依赖
+        const subs = this.subs.slice();
+        for(let item of subs){
             item.update();
         }
     }

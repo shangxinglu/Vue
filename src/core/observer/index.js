@@ -40,7 +40,6 @@ export function defineReactive(data, key, val) {
             childOb?.dep.append();
 
             dep.append();
-
             return val;
         }
     })
