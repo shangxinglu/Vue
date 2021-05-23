@@ -35,7 +35,8 @@ export function defineReactive(data, key, val) {
         },
 
         get() {
-            debugger
+            // console.log(key);
+            // debugger
             childOb?.dep.append();
 
             dep.append();

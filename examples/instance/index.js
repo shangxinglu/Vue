@@ -1,26 +1,39 @@
 'use strict';
 
 import Vue from '../../src/core/instance/index';
-import {defineReactive} from '../../src/core/observer/index';
+import { defineReactive, Observer } from '../../src/core/observer/index';
+import Watcher from '../../src/core/observer/watcher'
 
 const vue = new Vue;
 
 const obj = {
-    // x:[1,2,4],
-    // y:{
-    //     x:1
-    // },
+    x:[1,2,4,{x:1}],
+    y: {
+        x: 1
+    },
     // z:20,
-    y:1
+    // y:1
 };
+vue.data = obj;
+// defineReactive(vue,'data',obj);
+new Observer(vue.data);
 
-defineReactive(vue,'data',obj);
-
-vue.$watch('data.y',function(){
+// debugger
+// new Watcher(vue.data,'y',function(){
+//     console.log('run watcher');
+// })
+const unwatch = vue.$watch('data.x', function () {
     console.log('run watcher');
-},{
+}, {
     // immediate:true,
-    // deep:false,
+    deep: true,
 })
 
-debugger
+const np = {
+    vue,
+    unwatch,
+};
+
+window.np = np;
+
+// debugger

@@ -14,6 +14,7 @@ export function traverse(value) {
 
 // 负责添加属性
 function _traverse(value,seen){
+    
     const isA = Array.isArray(value);
     // 排除基本数据类型
     if(!(isA||isObject(value))) return;
@@ -35,7 +36,7 @@ function _traverse(value,seen){
     
     } else {
         const keyArr = Object.keys(value);
-
+        
         for(let item of keyArr){
             _traverse(value[item],seen)
         }

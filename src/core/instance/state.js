@@ -21,13 +21,16 @@ export function stateMixin(Vue) {
         // debugger
         
         const vm = this,
-        watch = new Watcher(vm,expOrFn,cb);
+        watch = new Watcher(vm,expOrFn,cb,options);
 
         if(options?.immediate){
             cb.call(vm,watch.value);
         }
 
-        return watch.teardown;
+        return function unwatch(){
+            watch.teardown();
+
+        }
     }
 }
 

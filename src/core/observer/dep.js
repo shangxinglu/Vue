@@ -25,7 +25,7 @@ export default class Dep {
     // 获取依赖
     append(){
         if(Dep.target){
-            debugger
+            // debugger
             // this.addSub(Dep.target);
 
             // 为了让watcher能够控制依赖

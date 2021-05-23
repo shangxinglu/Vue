@@ -6,6 +6,9 @@ import {
 
 import { setTarget } from './dep';
 
+import {traverse} from './traverse';
+
+
 // 收集依赖项dep
 // 执行回调
 export default class Wathcer {
@@ -71,10 +74,13 @@ export default class Wathcer {
       // 防止dep的sub数组里重复添加
       // if(this.deps.includes(dep)) return;
       const {id} = dep;
+      console.log(id);
+
       if (this.depIds.has(id)) return;
       this.depIds.add(id);
       // debugger
       this.deps.push(dep); 
+
       // 将watch放入dep的依赖数组内
       // 不然dep的notify无法通知依赖的执行
       dep.addSub(this);
@@ -91,7 +97,7 @@ export default class Wathcer {
    // 取消观察
    teardown() {
 
-      for(let item of this.dep){
+      for(let item of this.deps){
          item.removeSub(this);
       }
    }
