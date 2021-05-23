@@ -18,8 +18,6 @@ export function defineReactive(data, key, val) {
     // 递归val中的对象
     const childOb = observer(val);
 
-
-
     Object.defineProperty(data, key, {
         configurable: true,
         enumerable: true,
@@ -37,6 +35,7 @@ export function defineReactive(data, key, val) {
         },
 
         get() {
+            debugger
             childOb?.dep.append();
 
             dep.append();

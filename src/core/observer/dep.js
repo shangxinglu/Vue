@@ -2,9 +2,12 @@
 
 import {remove} from '../util/index';
 
+let uid = 0; // dep实例标识id
+
 export default class Dep {
 
     constructor(){
+        this.id = uid++;
         this.subs=[];
     }
 
@@ -22,6 +25,7 @@ export default class Dep {
     // 获取依赖
     append(){
         if(Dep.target){
+            debugger
             // this.addSub(Dep.target);
 
             // 为了让watcher能够控制依赖
@@ -33,7 +37,7 @@ export default class Dep {
 
     // 通知依赖
     notify(){
-        // 防止执行新添加或修改的依赖
+        // 防止执行修改后的回调
         const subs = this.subs.slice();
         for(let item of subs){
             item.update();

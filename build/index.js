@@ -17,11 +17,14 @@
 //         })
 // }
 
-import '../examples/obsever/watcher';
+// import '../examples/obsever/watcher';
 
 // import '../examples/obsever/observer';
 
 // import '../examples/obsever/observerArr';
+
+import '../examples/instance/index';
+
 
 
 

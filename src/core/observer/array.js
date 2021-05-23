@@ -49,7 +49,7 @@ for (let item of methodArr) {
         ob.observerArray(insert);
       }
 
-      ob.dep.notice();
+      ob.dep.notify();
 
 
       return result;

@@ -4,7 +4,7 @@ import Watcher from '../observer/watcher';
 
 
 
-export function stateMixin() {
+export function stateMixin(Vue) {
     
     /**
      * @desc 监听对象上一个表达式或者一个函数的变化
@@ -18,12 +18,16 @@ export function stateMixin() {
      * @returns {Function} unwatch 取消监听
      */
     Vue.prototype.$watch = function(expOrFn,cb,options){
+        // debugger
+        
         const vm = this,
         watch = new Watcher(vm,expOrFn,cb);
 
         if(options?.immediate){
-            cb.call(this,);
+            cb.call(vm,watch.value);
         }
+
+        return watch.teardown;
     }
 }
 
