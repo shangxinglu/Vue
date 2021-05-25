@@ -3,8 +3,10 @@
 import Vue from '../../src/core/instance/index';
 import { defineReactive, Observer } from '../../src/core/observer/index';
 import Watcher from '../../src/core/observer/watcher'
+import {isDev} from '../../src/core/util/index'
 
 const vue = new Vue;
+console.log('isDev',isDev)
 
 const obj = {
     x:[1,2,4,{x:1}],
@@ -22,11 +24,11 @@ new Observer(vue.data);
 // new Watcher(vue.data,'y',function(){
 //     console.log('run watcher');
 // })
-const unwatch = vue.$watch('data.x', function () {
+const unwatch = vue.$watch('data.y', function () {
     console.log('run watcher');
 }, {
     // immediate:true,
-    deep: true,
+    // deep: true,
 })
 
 const np = {

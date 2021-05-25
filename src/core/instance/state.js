@@ -1,11 +1,14 @@
 'use strict';
 
+import { defineReactive,set,del } from '../observer';
 import Watcher from '../observer/watcher';
+import { OB_KEY } from '../shared/constant';
+import { isValidArrayIndex } from '../util/index';
 
 
 
 export function stateMixin(Vue) {
-    
+
     /**
      * @desc 监听对象上一个表达式或者一个函数的变化
      * 
@@ -17,20 +20,44 @@ export function stateMixin(Vue) {
      * 
      * @returns {Function} unwatch 取消监听
      */
-    Vue.prototype.$watch = function(expOrFn,cb,options){
+    Vue.prototype.$watch = function (expOrFn, cb, options) {
         // debugger
-        
-        const vm = this,
-        watch = new Watcher(vm,expOrFn,cb,options);
 
-        if(options?.immediate){
-            cb.call(vm,watch.value);
+        const vm = this,
+            watch = new Watcher(vm, expOrFn, cb, options);
+
+        if (options?.immediate) {
+            cb.call(vm, watch.value);
         }
 
-        return function unwatch(){
+        return function unwatch() {
             watch.teardown();
 
         }
     }
+
+
+    /**
+     * @description 在响应式对象中添加一个响应式属性
+     *              触发依赖通知
+     * 
+     * @param {Object|Array} target
+     * @param {String|Number} key
+     * @param {any} value
+     * 
+     * @returns {any} value
+     */
+    Vue.prototype.$set = set;
+
+    /**
+     * @description 删除响应对象中的某个属性
+     *              触发依赖通知
+     * 
+     * @param {Object|Array} target 
+     * @param {String|Number} key 
+     */
+    Vue.prototype.$delete = del;
+
+
 }
 

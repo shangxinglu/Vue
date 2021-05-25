@@ -32,3 +32,12 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwn(obj,key){
     return hasOwnProperty.call(obj,key);
 }
+
+
+// 判断是否是数组有效下标
+export function isValidArrayIndex(key){
+    key = parseInt(key);
+
+    return key>0&&isFinite(key);
+
+}

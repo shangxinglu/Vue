@@ -2,7 +2,7 @@
 
 import Dep from './dep';
 import { arrayMethod } from './array';
-import { isObject, hasOwn, def,hasProto } from '../util/index';
+import { isObject, hasOwn, def, hasProto } from '../util/index';
 import { OB_KEY } from '../shared/constant';
 
 /**
@@ -59,9 +59,9 @@ export class Observer {
 
         // 将依赖存放到对象上
         this.dep = new Dep;
-        
+
         if (Array.isArray(obj)) {
-            Object.setPrototypeOf(obj,arrayMethod);
+            Object.setPrototypeOf(obj, arrayMethod);
             this.observerArray(obj);
         } else {
             this.walk(obj);
@@ -102,4 +102,71 @@ export function observer(val) {
     }
 
     return ob;
+}
+
+/**
+   * @description 在响应式对象中添加一个响应式属性
+   *              触发依赖通知
+   * 
+   * @param {Object|Array} target
+   * @param {String|Number} key
+   * @param {any} value
+   * 
+   * @returns {any} value
+   */
+export function set(target, key, value) {
+
+    // 数组中添加响应式数据
+    if (Array.isArray(target) && isValidArrayIndex(key)) {
+        const maxLen = Math.max(target.length, key);
+        target.length = maxLen;
+        target.splice(key, 1, value);
+        return value;
+    }
+
+    // 如果key已存在
+    // 避免阻止访问Object原型属性和方法
+    if (key in target && !(key in Object.prototype)) {
+        target[key] = value;
+        return value;
+    }
+
+    const ob = target[OB_KEY];
+
+    if (!ob) {
+        target[key] = value;
+        return value;
+    }
+
+    defineReactive(target, key, value);
+    // 通知obj的依赖
+    ob.dep.notify();
+
+    return value;
+
+}
+
+
+/**
+ * @description 删除响应对象中的某个属性
+ *              触发依赖通知
+ * 
+ * @param {Object|Array} target 
+ * @param {String|Number} key 
+ */
+export function del(target, key) {
+    // 数组中删除响应式数据
+    if (Array.isArray(target) && isValidArrayIndex(key)) {
+        target.splice(key, 1);
+        return value;
+    }
+
+    if(!hasOwn(target,key)) return;
+
+    delete target[key];
+
+    const ob = target[OB_KEY];
+
+    ob?.dep.notify();
+
 }
