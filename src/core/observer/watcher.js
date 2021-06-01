@@ -72,9 +72,7 @@ export default class Wathcer {
    // 添加依赖
    addDep(dep) {
       // 防止dep的sub数组里重复添加
-      // if(this.deps.includes(dep)) return;
       const {id} = dep;
-      console.log(id);
 
       if (this.depIds.has(id)) return;
       this.depIds.add(id);
