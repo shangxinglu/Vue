@@ -23,7 +23,9 @@
 
 // import '../examples/obsever/observerArr';
 
-import '../examples/instance/index';
+// import '../examples/instance/index';
+
+import '../examples/parser/parser-html';
 
 
 
