@@ -67,7 +67,6 @@ export function isPrimitive(val) {
     return ['string', 'number', 'symbol', 'boolean'].includes(typeof val);
 }
 
-// 判断是否是对象 排除null
-export function isObject(val) {
-    return val !== null && typeof val === 'object';
-}
+
+// 打印数据
+export const log = console.log;

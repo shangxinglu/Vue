@@ -1,25 +1,12 @@
 
 
 import {parseHTML} from '../../src/compiler/parser/html-parser'
+import {log} from '../../src/core/util/index'
 
-const html =  `<div>
-    <span>124</span>
-</div>
-`;
-const log = console.log;
+const html = `<div class="d1" id="d1"><span></span></div>`;
 
-const start = '[a-zA-Z_][\\w\\-\\.]*',
-qname = `((?:${start}\\:)?${start})`,
-regexp = new RegExp(qname);
-
-window.sxl = {
-    regexp,
-};
-
-log(qname);
-
-// parseHTML(html,{
-//     start(){
-//         log('start');
-//     }
-// })
+parseHTML(html,{
+    start(){
+        log('start');
+    }
+});
