@@ -68,5 +68,16 @@ export function isPrimitive(val) {
 }
 
 
+// 总是返回false
+export const no = ()=>false;
+
+// 制作映射
+export function makeMap(key,isLower){
+    const keyArr = key.split(','),
+    set = new Set(keyArr);
+
+    return isLower? val=>set.has(val.toLowerCase()):val=>set.has(val);
+}
+
 // 打印数据
 export const log = console.log;

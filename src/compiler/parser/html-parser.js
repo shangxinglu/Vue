@@ -1,5 +1,5 @@
 
-import { log } from '../../core/util/index'
+import { log, no, makeMap } from '../../core/util/index'
 
 
 const ncname = '[A-Za-z_][\\w.\\-]*', // 基本的名称正则
@@ -13,6 +13,9 @@ const ncname = '[A-Za-z_][\\w.\\-]*', // 基本的名称正则
     comment = /^<!--/, // 注释
     conditionalComment = /^!\[/; // 条件注释
 
+export const isPlainTextElement = makeMap('script,style,textarea', true);
+
+const regCache = {}; // 正则缓存
 
 /**
  * @description 解析HTML字符模板
@@ -24,85 +27,105 @@ const ncname = '[A-Za-z_][\\w.\\-]*', // 基本的名称正则
  * @param {Function} options.chars 解析到文本触发
  * @param {Function} options.comment 解析到注释触发
  * @param {Boolean} options.shouldKeepComment 是否保留注释
+ * @param {Function} options.isUnaryTag 判断标签是否是自闭合标签
  * 
  * 
  */
 export function parseHTML(html, options) {
-    const stack = [];
+    const stack = [],
+        isUnaryTag = options.isUnaryTag || no;
 
-
+    let lastTag; // 当前解析最后一个标签名
     while (html) {
-        // debugger;
-        let textEndIndex = html.indexOf('<');
-        if (textEndIndex === 0) {
+        // 确保不在纯文本中
+        if (!lastTag || !isPlainTextElement(lastTag)) {
 
-            // 解析注释
-            if (comment.test(html)) {
-                const commentEndIndex = html.indexOf('-->');
-                if (commentEndIndex >= 0) {
-                    advance(commentEndIndex + 3);
-                    if (options.shouldKeepComment) {
-                        options.comment(html.substring(4, commentEndIndex));
+            // debugger;
+            let textEndIndex = html.indexOf('<');
+            if (textEndIndex === 0) {
+
+                // 解析注释
+                if (comment.test(html)) {
+                    const commentEndIndex = html.indexOf('-->');
+                    if (commentEndIndex >= 0) {
+                        advance(commentEndIndex + 3);
+                        if (options.shouldKeepComment) {
+                            options.comment(html.substring(4, commentEndIndex));
+                        }
+                        continue;
                     }
+                }
+
+                // 解析条件注释
+                if (conditionalComment.test(html)) {
+                    const endInedx = html.indexOf(']>');
+                    advance(endInedx + 2);
+
+                    continue;
+                }
+
+                // 解析DOCTYPE
+                const doctypeMatch = html.match(doctype);
+                if (doctypeMatch) {
+                    advance(doctypeMatch);
+                    continue;
+                }
+
+                // 解析结束标签
+                const endTagMatch = html.match(endTag);
+                if (endTagMatch) {
+                    advance(endTagMatch);
+                    parseEndTag(endTagMatch[1]);
+                    continue;
+                }
+
+                // 解析开始标签
+                const startTagMatch = parseStartTag();
+                if (startTagMatch) {
+                    handleStartTag(startTagMatch); // start钩子函数回调
                     continue;
                 }
             }
 
-            // 解析条件注释
-            if (conditionalComment.test(html)) {
-                const endInedx = html.indexOf(']>');
-                advance(endInedx + 2);
-
-                continue;
-            }
-
-            // 解析DOCTYPE
-            const doctypeMatch = html.match(doctype);
-            if (doctypeMatch) {
-                advance(doctypeMatch);
-                continue;
-            }
-
-            // 解析结束标签
-            const endTagMatch = html.match(endTag);
-            if (endTagMatch) {
-                advance(endTagMatch);
-                continue;
-            }
-
-            // 解析开始标签
-            const startTagMatch = parseStartTag();
-            if (startTagMatch) {
-                handleStartTag(startTagMatch); // start钩子函数回调
-                continue;
-            }
-        }
-
-        let text = ''; // 文本
-        if (textEndIndex >= 0) {
-
-            while (!(endTag.test(html) || startTagOpen.test(html) || comment.test(html) || conditionalComment.test(html))) {
-                textEndIndex = html.indexOf('<', 1);
-                if (textEndIndex < 0){
-                    text+=html;
-                    html = '';
-                    break;
-                }
-
+            let text = ''; // 文本
+            if (textEndIndex >= 0) {
                 text += html.substring(0, textEndIndex);
                 advance(textEndIndex);
+                while (!(endTag.test(html) || startTagOpen.test(html) || comment.test(html) || conditionalComment.test(html))) {
+                    textEndIndex = html.indexOf('<', 1);
+                    if (textEndIndex < 0) {
+                        text += html;
+                        html = '';
+                        break;
+                    }
+
+                    text += html.substring(0, textEndIndex);
+                    advance(textEndIndex);
+                }
+
+                options.chars?.(text);
+
             }
 
-            options.chars?.(text);
+            if (textEndIndex < 0) {
+                text += html;
+                html = '';
+                options.chars?.(text);
 
+            }
+        } else {
+            const stackedTag = lastTag.toLowerCase(),
+                stackedTagReg = regCache[stackedTag] || (regCache[stackedTag] = new RegExp(`([\\s\\S]*?)(</${stackedTag}[^>]*>)`, 'i'));
+
+            html = html.replace(stackedTagReg, function (all, text) {
+                options.chars?.(text);
+
+                return '';
+            });
+
+            options.end?.(stackedTag);
         }
 
-        if (textEndIndex < 0) {
-            text += html;
-            html = '';
-            options.chars?.(text);
-
-        }
 
     }
 
@@ -119,7 +142,7 @@ export function parseHTML(html, options) {
     }
 
     /**
-     * @description  解析开始标签
+     * @description  解析开始标签处理
      * 
      * @returns {Object} 解析后的标签对象
      */
@@ -158,9 +181,31 @@ export function parseHTML(html, options) {
     }
 
     /**
+     * @description 解析结束标签处理
+     * 
+     * @param {String} tagName 标签名称
+     */
+     function parseEndTag(tagName){
+        
+        for(let current = stack.length-1;current>=0;current--){
+            const pop = stack.pop();
+            if(pop.tagName.lowerCasedTag===tagName.toLowerCase()){
+                break;
+            }
+        }
+     }
+
+    /**
      * @description 开始标签解析后的回调处理
      */
     function handleStartTag(match) {
+        const { tagName, unarySlash } = match,
+            isUnary = isUnaryTag(unarySlash) || !!unarySlash;
+
+        if (!unarySlash) {
+            stack.push({tag:tagName,lowerCasedTag:tagName.toLowerCase(),attrs:match.attrs })
+            lastTag = tagName;
+        }
         options.start();
     }
 }
