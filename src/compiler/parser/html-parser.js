@@ -21,7 +21,7 @@ const ncname = '[A-Za-z_][\\w.\\-]*', // 基本的名称正则
  * @param {Object} options
  * @param {Function} options.start 解析到标签开始位置触发
  * @param {Function} options.end 解析到标签结束位置触发
- * @param {Function} options.chart 解析到文本触发
+ * @param {Function} options.chars 解析到文本触发
  * @param {Function} options.comment 解析到注释触发
  * @param {Boolean} options.shouldKeepComment 是否保留注释
  * 
@@ -31,50 +31,79 @@ export function parseHTML(html, options) {
     const stack = [];
 
 
-
     while (html) {
         // debugger;
+        let textEndIndex = html.indexOf('<');
+        if (textEndIndex === 0) {
 
-        // 解析注释
-        if (comment.test(html)) {
-            const commentEndIndex = html.indexOf('-->');
-            if (commentEndIndex >= 0) {
-                advance(commentEndIndex + 3);
-                if (options.shouldKeepComment) {
-                    options.comment(html.substring(4,commentEndIndex));
+            // 解析注释
+            if (comment.test(html)) {
+                const commentEndIndex = html.indexOf('-->');
+                if (commentEndIndex >= 0) {
+                    advance(commentEndIndex + 3);
+                    if (options.shouldKeepComment) {
+                        options.comment(html.substring(4, commentEndIndex));
+                    }
+                    continue;
                 }
+            }
+
+            // 解析条件注释
+            if (conditionalComment.test(html)) {
+                const endInedx = html.indexOf(']>');
+                advance(endInedx + 2);
+
+                continue;
+            }
+
+            // 解析DOCTYPE
+            const doctypeMatch = html.match(doctype);
+            if (doctypeMatch) {
+                advance(doctypeMatch);
+                continue;
+            }
+
+            // 解析结束标签
+            const endTagMatch = html.match(endTag);
+            if (endTagMatch) {
+                advance(endTagMatch);
+                continue;
+            }
+
+            // 解析开始标签
+            const startTagMatch = parseStartTag();
+            if (startTagMatch) {
+                handleStartTag(startTagMatch); // start钩子函数回调
                 continue;
             }
         }
 
-        // 解析条件注释
-        if(conditionalComment.test(html)){
-            const endInedx = html.indexOf(']>');
-            advance(endInedx+2);
+        let text = ''; // 文本
+        if (textEndIndex >= 0) {
 
-            continue;
+            while (!(endTag.test(html) || startTagOpen.test(html) || comment.test(html) || conditionalComment.test(html))) {
+                textEndIndex = html.indexOf('<', 1);
+                if (textEndIndex < 0){
+                    text+=html;
+                    html = '';
+                    break;
+                }
+
+                text += html.substring(0, textEndIndex);
+                advance(textEndIndex);
+            }
+
+            options.chars?.(text);
+
         }
 
-        // 解析DOCTYPE
-        const doctypeMatch = html.match(doctype);
-        if(doctypeMatch){
-            advance(doctypeMatch);
-            continue;
+        if (textEndIndex < 0) {
+            text += html;
+            html = '';
+            options.chars?.(text);
+
         }
 
-        // 解析结束标签
-        const endTagMatch = html.match(endTag);
-        if (endTagMatch) {
-            advance(endTagMatch);
-            continue;
-        }
-
-        // 解析开始标签
-        const startTagMatch = parseStartTag();
-        if (startTagMatch) {
-            handleStartTag(startTagMatch); // start钩子函数回调
-            continue;
-        }
     }
 
     // 根据匹配结果或截取长度更新html
