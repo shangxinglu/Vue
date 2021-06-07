@@ -25,7 +25,8 @@
 
 // import '../examples/instance/index';
 
-import '../examples/parser/parser-html';
+// import '../examples/parser/parser-html';
+import '../examples/parser/index';
 
 
 

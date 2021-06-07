@@ -1,4 +1,5 @@
 import { parseHTML } from './html-parser'
+import {log} from '../../core/util/index'
 
 
 
@@ -10,24 +11,60 @@ import { parseHTML } from './html-parser'
  */
 export function parse(template, options) {
     const stack = [];
+    let root = null; // 根节点
     let currentParent = null; // 当前父级元素
 
 
     // 关闭节点
     function closeElement(el) {
+        trimEndingWhitespace(el);
 
+
+
+        // 构建父子节点关系
+        if (currentParent && !el.forbidden) {
+            currentParent.children.push(el),
+                el.parent = currentParent;
+        }
+
+    }
+
+    // 去除尾随的空白文本节点
+    function trimEndingWhitespace(el) {
+        let lastNode = null;
+        // debugger
+
+        let { children } = el;
+        while (lastNode = children[children.length - 1] && lastNode.type === 3 && lastNode.text === '') {
+            children.pop();
+        }
     }
 
     parseHTML(template, {
         start(tagName, attrs, isUnary) {
+            log('start');
             const el = createASTElement(tagName, attrs, currentParent);
+
+            // 判断禁止标签
+            if (isForbiddenTag(el)) {
+                el.forbidden = true;
+            }
+
+            if (!root) {
+                root = el;
+            }
+
             if (!isUnary) {
                 currentParent = el;
                 stack.push(el);
+            } else {
+                closeElement(el);
             }
         },
 
         end(tag) {
+            log('end');
+
             const el = stack.pop();
             currentParent = stack[stack.length - 1];
             closeElement(el);
@@ -37,10 +74,20 @@ export function parse(template, options) {
 
         },
 
-        comment() {
+        comment(text) {
+            if (currentParent) {
+                const el = {
+                    type: 3,
+                    text,
+                    isComment: true,
+                };
+                currentParent.children.push(el);
+            }
 
         }
     })
+
+    return root;
 }
 
 /**
@@ -61,4 +108,11 @@ export function createASTElement(tag, attrs, parent) {
         children: []
 
     }
+}
+
+
+// 判断是否是禁止的标签
+function isForbiddenTag(el) {
+    const { tag } = el;
+    return (tag === 'style' || tag === 'script');
 }

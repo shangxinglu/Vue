@@ -186,27 +186,37 @@ export function parseHTML(html, options) {
      * @param {String} tagName 标签名称
      */
      function parseEndTag(tagName){
-        
-        for(let current = stack.length-1;current>=0;current--){
-            const pop = stack.pop();
-            if(pop.tagName.lowerCasedTag===tagName.toLowerCase()){
+        let current
+        for(current = stack.length-1;current>=0;current--){
+            const node = stack[stack.length-1];
+            if(node.lowerCasedTag===tagName.toLowerCase()){
                 break;
             }
         }
+
+        if(current>=0){
+
+            for(let i = stack.length-1;i>=current;i--){
+
+                options.end?.(stack[i].tag);
+            }
+        }
+
+        stack.length  =current;
      }
 
     /**
      * @description 开始标签解析后的回调处理
      */
     function handleStartTag(match) {
-        const { tagName, unarySlash } = match,
+        const { tagName, unarySlash,attrs } = match,
             isUnary = isUnaryTag(unarySlash) || !!unarySlash;
 
-        if (!unarySlash) {
-            stack.push({tag:tagName,lowerCasedTag:tagName.toLowerCase(),attrs:match.attrs })
+        if (!isUnary) {
+            stack.push({tag:tagName,lowerCasedTag:tagName.toLowerCase(),attrs:attrs })
             lastTag = tagName;
         }
-        options.start();
+        options.start(tagName,attrs,isUnary);
     }
 }
 
