@@ -12,4 +12,6 @@ parseHTML(html,{
     chars(text){
         log('chars hook',text);
     }
+
+    
 });
