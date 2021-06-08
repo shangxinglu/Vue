@@ -17,6 +17,13 @@ export const isPlainTextElement = makeMap('script,style,textarea', true);
 
 const regCache = {}; // 正则缓存
 
+// 解码属性
+function decodeAttr(value,shouldDecodeNewLines){{
+    
+}
+
+}
+
 /**
  * @description 解析HTML字符模板
  * 
@@ -28,6 +35,8 @@ const regCache = {}; // 正则缓存
  * @param {Function} options.comment 解析到注释触发
  * @param {Boolean} options.shouldKeepComment 是否保留注释
  * @param {Function} options.isUnaryTag 判断标签是否是自闭合标签
+ * @param {Boolean} options.shouldDecodeNewlines 处理attr中换行符
+ * @param {Boolean} options.shouldDecodeNewlinesForHref 处理a标签中href的换行符
  * 
  * 
  */
@@ -211,6 +220,20 @@ export function parseHTML(html, options) {
     function handleStartTag(match) {
         const { tagName, unarySlash,attrs } = match,
             isUnary = isUnaryTag(unarySlash) || !!unarySlash;
+
+            const len = attrs.length,
+            attrsArr = new Array(len);
+            for(let i =0;i<len;i++){
+                let item = attrs[i],
+                value = item[3]||item[4]||item[5]||'',
+                shouldDecodeNewLines = tagName==='a'&&item[1]==='href'?
+                options.shouldDecodeNewLinesForHref:options.shouldDecodeNewLines; // 是否解析换行符
+
+                attrsArr[i] = {
+                    name:item[1],
+                    value:decodeAttr(value,shouldDecodeNewLines)
+                }
+            }
 
         if (!isUnary) {
             stack.push({tag:tagName,lowerCasedTag:tagName.toLowerCase(),attrs:attrs })

@@ -32,10 +32,12 @@ export function parse(template, options) {
     // 去除尾随的空白文本节点
     function trimEndingWhitespace(el) {
         let lastNode = null;
-        // debugger
 
         let { children } = el;
-        while (lastNode = children[children.length - 1] && lastNode.type === 3 && lastNode.text === '') {
+        // let tmp = children[children.length - 1];
+        // debugger
+
+        while ((lastNode = children[children.length - 1]) && lastNode.type === 3 && lastNode.text === '') {
             children.pop();
         }
     }
