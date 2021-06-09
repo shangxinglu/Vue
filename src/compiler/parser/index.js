@@ -17,9 +17,8 @@ export function parse(template, options) {
 
     // 关闭节点
     function closeElement(el) {
+        // debugger
         trimEndingWhitespace(el);
-
-
 
         // 构建父子节点关系
         if (currentParent && !el.forbidden) {
@@ -43,8 +42,8 @@ export function parse(template, options) {
     }
 
     parseHTML(template, {
-        start(tagName, attrs, isUnary) {
-            log('start');
+        start(tagName, attrs, isUnary,start,end) {
+            log('start',tagName,start,end);
             const el = createASTElement(tagName, attrs, currentParent);
 
             // 判断禁止标签
@@ -60,12 +59,13 @@ export function parse(template, options) {
                 currentParent = el;
                 stack.push(el);
             } else {
+                // debugger
                 closeElement(el);
             }
         },
 
-        end(tag) {
-            log('end');
+        end(tag,start,end) {
+            log('end',tag,start,end);
 
             const el = stack.pop();
             currentParent = stack[stack.length - 1];
