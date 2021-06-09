@@ -101,8 +101,9 @@ export function parseHTML(html, options) {
                 // 解析结束标签
                 const endTagMatch = html.match(endTag);
                 if (endTagMatch) {
+                    const startIndex= index;
                     advance(endTagMatch);
-                    parseEndTag(endTagMatch[1]);
+                    parseEndTag(endTagMatch[1],startIndex,index);
                     continue;
                 }
 
@@ -143,15 +144,15 @@ export function parseHTML(html, options) {
         } else {
             const stackedTag = lastTag.toLowerCase(),
                 stackedTagReg = regCache[stackedTag] || (regCache[stackedTag] = new RegExp(`([\\s\\S]*?)(</${stackedTag}[^>]*>)`, 'i'));
-            
-            let start = index;  
-            html = html.replace(stackedTagReg, function (all, text,endTag) {
+
+            let start = index;
+            html = html.replace(stackedTagReg, function (all, text, endTag) {
                 options.chars?.(text);
-                index+=text.length+endTag.length;
+                index += text.length + endTag.length;
                 return '';
             });
-            
-            parseEndTag(stackedTag,start,index);
+
+            parseEndTag(stackedTag, start, index);
         }
 
 
@@ -189,7 +190,7 @@ export function parseHTML(html, options) {
             tagName: startTag[1],
             attrs: [],
             unarySlash: '', // 判断是否是自闭合标签
-            start:index, // 记录开始坐标
+            start: index, // 记录开始坐标
         }
         advance(startTag);
 
@@ -205,9 +206,9 @@ export function parseHTML(html, options) {
         if (!end) return;
 
         matchObj.unarySlash = end[1],
-        advance(end),
-        matchObj.end = index; // 记录结束坐标
-        
+            advance(end),
+            matchObj.end = index; // 记录结束坐标
+
 
         return matchObj;
 
@@ -220,8 +221,8 @@ export function parseHTML(html, options) {
      * 
      * @param {String} tagName 标签名称
      */
-    function parseEndTag(tagName,start,end) {
-        debugger
+    function parseEndTag(tagName, start, end) {
+        // debugger
         let current
         for (current = stack.length - 1; current >= 0; current--) {
             const node = stack[stack.length - 1];
@@ -234,23 +235,23 @@ export function parseHTML(html, options) {
 
             for (let i = stack.length - 1; i >= current; i--) {
 
-                options.end?.(stack[i].tag,start,end);
+                options.end?.(stack[i].tag, start, end);
             }
         } else {
             current = 0;
         }
-        
+
 
         stack.length = current;
-      
-        lastTag = stack[stack.length-1]?.tag||'';
+
+        lastTag = stack[stack.length - 1]?.tag || '';
     }
 
     /**
      * @description 开始标签解析后的回调处理
      */
     function handleStartTag(match) {
-        const { tagName, unarySlash, attrs,start,end } = match,
+        const { tagName, unarySlash, attrs, start, end } = match,
             isUnary = isUnaryTag(unarySlash) || !!unarySlash;
 
         const len = attrs.length,
@@ -268,10 +269,10 @@ export function parseHTML(html, options) {
         }
 
         if (!isUnary) {
-            stack.push({ tag: tagName, lowerCasedTag: tagName.toLowerCase(), attrs: attrsArr})
+            stack.push({ tag: tagName, lowerCasedTag: tagName.toLowerCase(), attrs: attrsArr })
             lastTag = tagName;
         }
-        options.start(tagName, attrsArr, isUnary,start,end );
+        options.start(tagName, attrsArr, isUnary, start, end);
     }
 }
 

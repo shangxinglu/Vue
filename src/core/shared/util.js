@@ -79,5 +79,14 @@ export function makeMap(key,isLower){
     return isLower? val=>set.has(val.toLowerCase()):val=>set.has(val);
 }
 
+// 创建纯函数的缓存
+export function cached(fn){
+    const cacheObj = Object.create(null);
+    
+    return function cachedFn(str) {
+            return cacheObj[str] || (cacheObj[str]= fn(str));
+    }
+}
+
 // 打印数据
 export const log = console.log;

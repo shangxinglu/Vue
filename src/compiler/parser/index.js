@@ -1,5 +1,6 @@
 import { parseHTML } from './html-parser'
-import {log} from '../../core/util/index'
+import {log,cached} from '../../core/shared/util'
+
 
 
 
@@ -72,8 +73,8 @@ export function parse(template, options) {
             closeElement(el);
         },
 
-        chars() {
-
+        chars(text) {
+            log('text',text);
         },
 
         comment(text) {
