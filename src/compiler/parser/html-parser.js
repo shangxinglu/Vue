@@ -198,7 +198,7 @@ export function parseHTML(html, options) {
         // 获取属性
         let attr, end;
 
-        while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
+        while (!(end = html.match(startTagClose)) && (attr = html.match(attribute)||html.match(dynamicArgAttribute))) {
             matchObj.attrs.push(attr);
             advance(attr)
         }

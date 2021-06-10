@@ -1,4 +1,5 @@
 import { parseHTML } from './html-parser'
+import {parseText} from './text-parser'
 import {log,cached} from '../../core/shared/util'
 
 
@@ -75,6 +76,8 @@ export function parse(template, options) {
 
         chars(text) {
             log('text',text);
+            const textParse = parseText(text);
+            log(textParse);
         },
 
         comment(text) {
