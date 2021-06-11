@@ -77,7 +77,7 @@ export function parse(template, options) {
         chars(text) {
             log('text',text);
             const textParse = parseText(text);
-            log(textParse);
+            log('textParse',textParse);
         },
 
         comment(text) {
