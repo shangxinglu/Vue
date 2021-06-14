@@ -1,6 +1,7 @@
 
 
 import { cached, log } from '../../core/shared/util'
+import {parseFilter} from './filter-parser'
 const defaultDelimiterReg = /\{\{((?:.|\r?\n)+?)\}\}/g,
     delimiterReg = /[{}()|\[\]\/\\*.+?^$-]/g;
 
@@ -21,29 +22,33 @@ export function parseText(text, delimiter) {
     const textReg = delimiter ? bulidRegexp(delimiter) : defaultDelimiterReg;
     if (!textReg.test(text)) return;
 
-    const token = [];
+    const token = [],
+    rowToken = [];
 
     textReg.lastIndex = 0;
-    let match,vname,
-    lastIndex = 0,
-     index = 0;
+    let match, vname,
+        lastIndex = 0,
+        index = 0;
     while (match = textReg.exec(text)) {
 
-            index = match.index,
-            vname = match[1].trim();
+        index = match.index;
 
-            if (index > lastIndex) {
-                let sub = text.substring(lastIndex, index);
-                token.push(sub);
-            }
-            vname = `_s(${vname})`;
-            token.push(vname);
-            lastIndex = textReg.lastIndex;
+        // 获取变量之前的字符串
+        if (index > lastIndex) {
+            let sub = text.substring(lastIndex, index);
+            rowToken.push(sub);
+            token.push(sub);
+        }
 
-        
-    
+        const exp = parseFilter(match[1].trim());
+        token.push(`_s(${exp})`);
+        rowToken.push({'@binding':exp});
+
+        lastIndex = textReg.lastIndex;
+
     }
-    if(lastIndex<text.length){
+    
+    if (lastIndex < text.length) {
         let sub = text.substring(lastIndex, text.length);
         token.push(sub);
     }

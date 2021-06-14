@@ -1,10 +1,12 @@
 import { parseHTML } from './html-parser'
-import {parseText} from './text-parser'
-import {log,cached} from '../../core/shared/util'
+import { parseText } from './text-parser'
+import { log, cached } from '../../core/shared/util'
+import he from 'he';
 
 
-
-
+const lineBreakReg = /[\n\r]/; // 匹配换行和回车
+const whitespaceReg = /[ \f\t\n\t]+/g;
+const decodeHTMLCached = cached(he.decode); // 缓存he.decode函数
 /**
  * @description 将HTML字符串转为AST
  * 
@@ -12,6 +14,7 @@ import {log,cached} from '../../core/shared/util'
  * @param {Object} options 选项数据
  */
 export function parse(template, options) {
+    const whitespaceOption = options.whitespace;
     const stack = [];
     let root = null; // 根节点
     let currentParent = null; // 当前父级元素
@@ -44,8 +47,8 @@ export function parse(template, options) {
     }
 
     parseHTML(template, {
-        start(tagName, attrs, isUnary,start,end) {
-            log('start',tagName,start,end);
+        start(tagName, attrs, isUnary, start, end) {
+            log('start', tagName, start, end);
             const el = createASTElement(tagName, attrs, currentParent);
 
             // 判断禁止标签
@@ -66,8 +69,8 @@ export function parse(template, options) {
             }
         },
 
-        end(tag,start,end) {
-            log('end',tag,start,end);
+        end(tag, start, end) {
+            log('end', tag, start, end);
 
             const el = stack.pop();
             currentParent = stack[stack.length - 1];
@@ -75,9 +78,52 @@ export function parse(template, options) {
         },
 
         chars(text) {
-            log('text',text);
-            const textParse = parseText(text);
-            log('textParse',textParse);
+            log('text', text);
+
+            if (!currentParent) return;
+
+            const { children } = currentParent;
+
+            if (text.trim()) {
+                text = isTextTag(currentParent) ? text : decodeHTMLCached(text);
+            } else if (!children.length) {
+                text = '';
+            } else if (whitespaceOption) {
+                if (whitespaceOption === 'condense') {
+                    text = lineBreakReg.test(text) ? '' : ' ';
+                } else {
+                    text = ' ';
+                }
+            }
+
+            if(text){
+                if(whitespaceOption==='condense'){
+                    text  = text.replace(whitespaceReg,' ');
+                }
+
+                let child,textParse;
+
+                if(text!==' '&&(textParse = parseText(text))){
+                    child = {
+                        type:2,
+                        text,
+                        expression:textParse,
+                    }
+                } else if (!children.length){
+                    child = {
+                        type:3,
+                        text,
+
+                    }
+                }
+
+                if(child){
+                    children.push(child);
+                }
+            }
+
+            log('textParse', textParse);
+
         },
 
         comment(text) {
@@ -121,4 +167,10 @@ export function createASTElement(tag, attrs, parent) {
 function isForbiddenTag(el) {
     const { tag } = el;
     return (tag === 'style' || tag === 'script');
+}
+
+
+// 手否是纯文本标签
+function isTextTag(el) {
+    return el.tag === 'script' || el.tag === 'style';
 }
