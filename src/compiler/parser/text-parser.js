@@ -37,10 +37,12 @@ export function parseText(text, delimiter) {
         if (index > lastIndex) {
             let sub = text.substring(lastIndex, index);
             rowToken.push(sub);
-            token.push(sub);
+            token.push(JSON.stringify(sub));
+
         }
 
-        const exp = parseFilter(match[1].trim());
+        // const exp = parseFilter(match[1].trim());
+        const exp = match[1].trim();
         token.push(`_s(${exp})`);
         rowToken.push({'@binding':exp});
 
@@ -49,9 +51,13 @@ export function parseText(text, delimiter) {
     }
     
     if (lastIndex < text.length) {
-        let sub = text.substring(lastIndex, text.length);
-        token.push(sub);
+        let sub = text.substring(lastIndex);
+        rowToken.push(sub);
+        token.push(JSON.stringify(sub));
     }
 
-    return token;
+    return {
+        expression:token.join('+'),
+        token:rowToken,
+    };
 }

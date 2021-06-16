@@ -11,9 +11,9 @@ const decodeHTMLCached = cached(he.decode); // 缓存he.decode函数
  * @description 将HTML字符串转为AST
  * 
  * @param {String} template HTML字符串模板
- * @param {Object} options 选项数据
+ * @param {Object} [options={}] 选项数据
  */
-export function parse(template, options) {
+export function parse(template, options={}) {
     const whitespaceOption = options.whitespace;
     const stack = [];
     let root = null; // 根节点
@@ -107,7 +107,8 @@ export function parse(template, options) {
                     child = {
                         type:2,
                         text,
-                        expression:textParse,
+                        expression:textParse.expression,
+                        token:textParse.token,
                     }
                 } else if (!children.length){
                     child = {
@@ -122,7 +123,7 @@ export function parse(template, options) {
                 }
             }
 
-            log('textParse', textParse);
+            log('textParse', children);
 
         },
 
