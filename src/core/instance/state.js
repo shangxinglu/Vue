@@ -1,9 +1,8 @@
 'use strict';
 
-import { defineReactive,set,del } from '../observer';
+import { set,del } from '../observer';
 import Watcher from '../observer/watcher';
 import { OB_KEY } from '../shared/constant';
-import { isValidArrayIndex } from '../util/index';
 
 
 
@@ -21,7 +20,6 @@ export function stateMixin(Vue) {
      * @returns {Function} unwatch 取消监听
      */
     Vue.prototype.$watch = function (expOrFn, cb, options) {
-        // debugger
 
         const vm = this,
             watch = new Watcher(vm, expOrFn, cb, options);
