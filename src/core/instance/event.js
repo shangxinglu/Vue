@@ -49,17 +49,57 @@ export function  eventsMixin(Vue) {
         }
 
         // 移除某个监听器
-        const index = this._event[e].indexOf(fn);
-        this._event[e].splice(index,1);
+        for(let i= this._event[e].length,event = this._event[e];i>=0;i--){
+            let item = event[i];
+            if(item===fn|| item.fn===fn){
+                event.splice(i,1);
+                break;
+            }
+        }
+
+        return this;
+       
     }
 
     
-    Vue.prototype.$once = function (params) {
-        
+     /**
+     * @description 添加单次的自定义事件
+     * 
+     * @param {String|Array} e 事件名|事件名数组
+     * @param {Function} fn 事件监听器
+     */
+    Vue.prototype.$once = function (e,fn) {
+        const vm = this;
+
+        // 对fn函数进行装饰
+        // 添加移除功能
+       function deFn(){
+            fn.apply(vm,arguments);
+            vm.$off(e,deFn);
+        }
+
+        deFn.fn = fn; // 为了移除监听器
+
+        vm.$on(e,deFn);
+
+        return vm;
     }
 
-    Vue.prototype.$emit = function (params) {
-        
+    /**
+     * @description 触发当前的事件
+     * 
+     * @param {String} eventName 触发的事件名
+     * @param {Array} arg 传递给监听器的参数 以数组形式传递
+     */
+    Vue.prototype.$emit = function (eventName,[...arg]) {
+        const handler = this._event[eventName]||[];
+
+        for(let item of handler){
+            item.apply(this,arg);
+        }
+
+        return this;
+
     }
 
 
