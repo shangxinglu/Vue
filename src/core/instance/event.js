@@ -1,6 +1,13 @@
 
-export function  eventsMixin(Vue) {
-    this._event = Object.create(null);
+// 初始化事件
+export function initEvents(vm){
+    vm._event = Object.create(null);
+    vm._hasHookEvent = false;
+
+}
+
+
+export function eventsMixin(Vue) {
     
     /**
      * @description 添加自定义事件
