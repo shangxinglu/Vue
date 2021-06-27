@@ -1,5 +1,5 @@
 
-import { initLifecycle } from "./lifecycle"
+import { initLifecycle,callHook } from "./lifecycle"
 import {initEvents} from './event';
 import {initRender} from './render';
 
@@ -14,5 +14,6 @@ export function initMixin(Vue){
         initLifecycle(vm);
         initEvents(vm);
         initRender(vm);
+        callHook(vm,'beforeCreate');
     }
 }

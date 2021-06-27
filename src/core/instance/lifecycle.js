@@ -47,5 +47,10 @@ export function lifecycleMixin(Vue) {
 // 钩子函数执行
 export function callHook(vm,hook){
     const handler = vm.$options[hook];
+    if(handler){
+        for (let item of handler){
+            
+        }
+    }
     
 }
