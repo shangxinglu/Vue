@@ -88,5 +88,12 @@ export function cached(fn){
     }
 }
 
+// 判断promise类型
+export function isPromise(val){
+    return isDef(val) && 
+    typeof val.then === 'function' &&
+    typeof val.catch === 'function';
+}
+
 // 打印数据
 export const log = console.log;

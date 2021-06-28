@@ -2,6 +2,7 @@
 import { initLifecycle,callHook } from "./lifecycle"
 import {initEvents} from './event';
 import {initRender} from './render';
+import { initInjections } from "./inject";
 
 export function initMixin(Vue){
 
@@ -15,5 +16,6 @@ export function initMixin(Vue){
         initEvents(vm);
         initRender(vm);
         callHook(vm,'beforeCreate');
+        initInjections(vm);
     }
 }

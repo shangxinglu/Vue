@@ -1,4 +1,5 @@
 
+import {invokeWithErrorHandling} from '../util/index';
 
 // 初始化生命周期
 export function initLifecycle(vm){
@@ -47,10 +48,15 @@ export function lifecycleMixin(Vue) {
 // 钩子函数执行
 export function callHook(vm,hook){
     const handler = vm.$options[hook];
+    const info = `${hook} hook`;
     if(handler){
         for (let item of handler){
-            
+            invokeWithErrorHandling(item,vm,null,vm,info);
         }
+    }
+
+    if(vm._hasHookEvent){
+        vm.$emit(`hook:${hook}`);
     }
     
 }
