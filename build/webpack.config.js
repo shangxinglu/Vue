@@ -1,29 +1,27 @@
 'use strict';
 
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); // 生成index.html模板
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const webpack = require('webpack');
-
-const distPath = '../dist';
 
 module.exports = {
-    mode: "development",
-    // entry: ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true', '/build/index.js'],
-    entry: '/build/index.js',
+    entry: '/platform/web/entry.js',
     output: {
-        filename: 'index.js',
-        path: path.resolve(__dirname, distPath),
-        publicPath: '/',
+        path: path.resolve(__dirname, '../dist'),
+        filename: 'vue.js'
     },
-    plugins: [
-        new CleanWebpackPlugin(),
-
-        new HtmlWebpackPlugin({
-            title: 'Vue'
-        }),
-        new webpack.HotModuleReplacementPlugin(),
-
-    ],
-   
+    mode: 'development',
+    devtool: 'source-map',
+    module: {
+        rules:[
+            {
+                test: /\.ts$/,
+                loader: 'ts-loader',
+            }
+        ]
+    },
+    watch: true,
+    devServer: {
+        contentBase: path.join(__dirname, '/'),
+        hot: true,
+    }
+    
 }
