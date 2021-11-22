@@ -1,9 +1,15 @@
 import babel from 'rollup-plugin-babel'
-import typescript from 'rollup-plugin-typescript'
+import typescript from 'rollup-plugin-typescript2'
+import alias from '@rollup/plugin-alias';
+import path from 'path'
+
+import aliases from './alias'
+
+
 
 
  export default {
-    input:'./platform/web/entry.ts',
+    input:'src/platform/web/entry-runtime-with-compiler.ts',
     output:{
         file:'dist/vue.js',
         format:'esm',
@@ -11,10 +17,18 @@ import typescript from 'rollup-plugin-typescript'
     },
     plugins:[
         typescript({
-            exclude: 'node_modules/**'
+            
+            tsconfig: path.resolve(__dirname, '../tsconfig.json'),
+            cacheRoot: path.resolve(__dirname, '../node_modules/.rts2_cache'),
+            
+
         }),
         babel({
             exclude: 'node_modules/**'
+        }),
+        alias({
+            entries: aliases
         })
+
     ]
 }

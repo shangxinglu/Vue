@@ -1,10 +1,7 @@
-var Vue = /** @class */ (function () {
-    function Vue() {
-    }
-    return Vue;
-}());
+class Vue {
+}
 
-var compiler = function () {
+const compiler = () => {
     console.log('compiler');
 };
 

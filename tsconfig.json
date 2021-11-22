@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./",
+      "outDir": "dist",
+      "sourceMap": true,
+      "declaration":true,
+      "target": "es2020",
+      "useDefineForClassFields": false,
+      "module": "esnext",
+      "moduleResolution": "node",
+      "allowJs": true,
+      "strict": true,
+      "noUnusedLocals": true,
+      "experimentalDecorators": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "removeComments": false,
+    }
+  }
