@@ -1,3 +1,3 @@
-import Vue from '../../../core/index'
+import Vue from 'src/core/index'
 
 export default Vue

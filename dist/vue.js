@@ -1,9 +1,8 @@
 class Vue {
 }
 
-const compiler = () => {
-    console.log('compiler');
-};
+function compiler(template) {
+}
 
 Vue.compiler = compiler;
 
