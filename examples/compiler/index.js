@@ -11,7 +11,7 @@ const template = `
     <script type="module" src="./index.js"></script>
 </head>
 <body>
-    <div id=“app">
+    <div id="app">
         <div class="div1"></div>
         <div class="div2"></div>
     </div>

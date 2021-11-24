@@ -10,33 +10,65 @@ const doctypeReg = /^<!DOCTYPE [^>]+>/i
 const startTagOpenReg = /^<([\w\-]+)/
 
 // 属性正则
-const attributeReg = /^[\s]+[(\w\-]+[\s]*=[\s]*\"([^"]*?)\"/
+const attributeReg = /^[\s]+([(\w\-]+)[\s]*=[\s]*\"([^"]*?)\"/
 
 // 开始标签闭合正则
 const startTagCloseReg = /^[\s]*>/
 
 // 结束标签
-const endTagReg = /^<\/[\w\-]+>/
+const endTagReg = /^<\/([\w\-]+)>/
 
 // 注释
-const commentReg = /^<!--[\s\S]*?-->/
+const commentReg = /^<!--([\s\S]*?)-->/
 
-// 文本
-const textReg = /^[\s\S]*?[^<]/
+
 
 type MatchType = Array<string>
 
 
-export function parseHTML(html:HTMLTemplate):void{
-    let startIndex:number,endIndex:number,index:number=0
+interface TagAttr{
+    name:string,
+    value:string
+}
+interface ParseOption {
+    // 开始标签hook
+    start?:(tag:string, attrs:Array<TagAttr>,startIndex?:number,endIndex?:number) => void,
+    // 结束标签hook
+    end?:(tag:string,startIndex?:number,endIndex?:number) => void,
+    // 文本hook
+    text?:(text:string,startIndex?:number,endIndex?:number) => void,
+    // 注释hook
+    comment?:(text:string,startIndex?:number,endIndex?:number) => void,
+}
+
+
+interface Tag {
+    tag:string,
+    attrs:Array<TagAttr>,
+} 
+
+export function parseHTML(html:HTMLTemplate,option:ParseOption):void{
+    let startIndex:number=0,
+    endIndex:number=0,
+    index:number=0
+
+    // 剪裁html中已经匹配的字符串
+    function crop(str:string){
+        // console.log(str);
+        
+        const len = str.length
+        html = html.substring(len)
+        startIndex = index
+        index+=len
+        endIndex = index
+        // console.log(startIndex,endIndex,index);
+    }
     
     while(html){
         // DOCTYPE标签
         if(doctypeReg.test(html)){
             const match = (html.match(doctypeReg)) as MatchType
             crop(match[0])
-           
-            
             continue
             
         }
@@ -45,65 +77,70 @@ export function parseHTML(html:HTMLTemplate):void{
         if(commentReg.test(html)){
             const match = (html.match(commentReg.source)) as MatchType
             crop(match[0])
+            option.comment?.(match[1],startIndex,endIndex)
             continue
         }
 
         // 开始标签
         if(startTagOpenReg.test(html)){
+            const tagObj:Tag = {
+                tag:'',
+                attrs:[]
+            }
            const match = (html.match(startTagOpenReg)) as MatchType
              crop(match[0])
-
-             parseTagAttr()
+             tagObj.tag = match[1]
+             parseTagAttr(tagObj)
                 continue
         }
 
         // 闭合标签
-        if(startTagCloseReg.test(html)){
-            const match = (html.match(startTagCloseReg)) as MatchType
+        if(endTagReg.test(html)){
+            const match = (html.match(endTagReg)) as MatchType
             crop(match[0])
+            option.end?.(match[1],startIndex,endIndex)
             continue
         }
 
-        // 文本
-        if(textReg.test(html)){
-            const match = (html.match(textReg)) as MatchType
-            crop(match[0])
+        /**
+         * 以上正则都不满足，则为文本
+         */
+        if(html.includes('<')){
+            const i = html.indexOf('<')
+            const text = html.slice(0,i)
+            crop(text) 
+            option.text?.(text,startIndex,endIndex)
             continue
         }
 
+        crop(html)
     }
 
     // 匹配标签属性
-    function parseTagAttr(){
-        if(attributeReg.test(html)){
+    function parseTagAttr(tagObj:Tag):void{
+
+        while(attributeReg.test(html)){
             const match = (html.match(attributeReg)) as MatchType
             crop(match[0])
+            const attrObj:TagAttr = {
+                name:match[1],
+                value:match[2]||''
+            }
+            tagObj.attrs.push(attrObj)
         }
-
-        parseTagClose()
+        parseTagClose(tagObj)
     }
 
-    // 匹配结束闭合
-    function parseTagClose(){
-        if(endTagReg.test(html)){
+    // 匹配标签闭合
+    function parseTagClose(tagObj:Tag){
+        if(startTagCloseReg.test(html)){
             const match = (html.match(startTagCloseReg)) as MatchType
             crop(match[0])
+            option.start?.(tagObj.tag,tagObj.attrs,startIndex,endIndex)
         }
     }
 
     
-    // 剪裁html中已经匹配的字符串
-    function crop(str:string){
-        console.log(str);
-        
-        const len = str.length
-        html = html.substring(len)
-        startIndex = index
-        index+=len
-        endIndex = index
-    console.log(startIndex,endIndex,index);
 
-
-    }
 }
 
