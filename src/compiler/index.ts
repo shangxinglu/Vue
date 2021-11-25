@@ -4,5 +4,7 @@ import {parse} from './parse'
 
 
 export function compiler(template:HTMLTemplate):void{
-    parse(template)
+    const ast = parse(template)
+    console.log('ast',ast);
+    
 }
