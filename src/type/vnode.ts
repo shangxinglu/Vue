@@ -8,8 +8,20 @@ declare enum VNodeType {
 // 虚拟节点
 declare interface VNode {
     tag: string,
-    attrArr: Array<object>,
-    children:Array<VNode>,
-    text:string,
-    comment:string
+    data: VNodeData,
+    children:Array<VNode>|null,
+    text:string|null,
+    comment:string|null
+}
+
+
+// 虚拟节点attr数据
+declare interface VNodeAttr {
+    [attrName:string]:string
+}
+
+
+// 虚拟节点数据
+declare interface VNodeData {
+    attrs?:VNodeAttr
 }
