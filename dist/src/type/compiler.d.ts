@@ -1,1 +1,1 @@
-export declare type HTMLTemplate = string;
+declare type HTMLTemplate = string;

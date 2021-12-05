@@ -1,7 +1,7 @@
 
-// import {VNode} from 'src/type/vnode'
+
 // import {createVNode} from 'src/core/vdom/vnode'
-import {HTMLTemplate} from 'src/type/compiler'
+
 
 // DOCTYPE标签
 const doctypeReg = /^<!DOCTYPE [^>]+>/i
@@ -48,7 +48,7 @@ interface ParseOption {
 interface Tag {
     tag:string,
     attrs:Array<TagAttr>,
-} 
+}
 
 export function parseHTML(html:HTMLTemplate,option:ParseOption):void{
     let startIndex:number=0,
@@ -103,7 +103,7 @@ export function parseHTML(html:HTMLTemplate,option:ParseOption):void{
             const i = html.indexOf('<')
             const text = html.slice(0,i)
             crop(text) 
-            if(['','\n'].includes(text)) continue
+            // if(['','\n'].includes(text)) continue
             option.text?.(text,startIndex,endIndex)
             continue
         }
@@ -132,8 +132,11 @@ export function parseHTML(html:HTMLTemplate,option:ParseOption):void{
             const match = (html.match(startTagCloseReg)) as MatchType
             crop(match[0])
             option.start?.(tagObj.tag,tagObj.attrs,false,startIndex,endIndex)
+            return
         }
         if(unaryReg.test(html)){
+            const match = (html.match(unaryReg)) as MatchType
+            crop(match[0])
             option.start?.(tagObj.tag,tagObj.attrs,true,startIndex,endIndex)
         }
             

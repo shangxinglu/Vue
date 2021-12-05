@@ -1,6 +1,3 @@
-import {VNode} from '../../type/vnode'
-
-
 
 
 /**

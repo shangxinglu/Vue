@@ -1,6 +1,6 @@
 import {parseHTML} from './parse-html'
-import {HTMLTemplate} from 'src/type/compiler'
-import { VNodeType} from 'src/type/vnode';
+
+
 
 
 interface ASTVNode{
@@ -43,12 +43,16 @@ function createASTText(text: string):ASTVNode {
 
 export function parse(template:HTMLTemplate){
     const stack:ASTElement[] = []
+    let root:ASTElement|null = null
     parseHTML(template,{
         start(tag,attrs,isUnary){
             console.log('start',tag,attrs);
             const currentNode = stack[stack.length-1]||null
             const newNode = createASTElement(tag,attrs,currentNode)
             stack.push(newNode)
+            if(!root){
+                root = newNode
+            }
             if(!currentNode) {
                 if(isUnary) {
                     stack.pop()
@@ -72,12 +76,14 @@ export function parse(template:HTMLTemplate){
             console.log('text',text);
             const currentNode = stack[stack.length-1]||null
             if(!currentNode) return
+            text = text.trim()
+            if(['\n',''].includes(text)) return
             const newNode = createASTText(text)
             currentNode.children.push(newNode)
             
         }   
     })
 
-    return stack
+    return root
 }
 

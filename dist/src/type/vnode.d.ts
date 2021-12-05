@@ -1,9 +1,9 @@
-export declare enum VNodeType {
+declare enum VNodeType {
     ELEMENT = 1,
     TEXT = 3,
     COMMENT = 8
 }
-export interface VNode {
+declare interface VNode {
     tag: string;
     attrArr: Array<object>;
     children: Array<VNode>;
